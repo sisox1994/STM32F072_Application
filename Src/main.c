@@ -21,6 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "string.h"  //for memcpy
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -35,6 +36,7 @@
 /* USER CODE BEGIN PD */
 #define APPLICATION_ADDRESS  ((uint32_t)0x08006000) 
 #define VECTOR_SIZE 0xBC + 0x04
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -58,6 +60,7 @@ void vector_table_and_remap(void)
     memcpy((void*)0x20000000, (void*)addr , VECTOR_SIZE);
     __HAL_SYSCFG_REMAPMEMORY_SRAM(); 
 }
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -73,6 +76,7 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
   vector_table_and_remap();
+  
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -104,6 +108,7 @@ int main(void)
     
       cnt++;
       __asm("NOP");
+      
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
