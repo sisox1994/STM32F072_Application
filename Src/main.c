@@ -34,7 +34,6 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define APPLICATION_ADDRESS  ((uint32_t)0x08006000) 
-#define VECTOR_SIZE 0xBC + 0x04
 
 /* USER CODE END PD */
 
@@ -55,12 +54,19 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
+
+#pragma location = 0x20000000
+__no_init __IO uint32_t VectorTable[48];
+
 void vector_table_and_remap(void)
 {
-    uint32_t addr = APPLICATION_ADDRESS; 
-    memcpy((void*)0x20000000, (void*)addr , VECTOR_SIZE);
-    __HAL_SYSCFG_REMAPMEMORY_SRAM(); 
+      for( uint32_t i = 0; i < 48; i++){
+          VectorTable[i] = *(__IO uint32_t*)(APPLICATION_ADDRESS + (i<<2));
+      }      
+      __HAL_RCC_SYSCFG_CLK_ENABLE();      
+      __HAL_SYSCFG_REMAPMEMORY_SRAM();     
 }
+
 
 /* USER CODE END PFP */
 
@@ -98,9 +104,12 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USART1_UART_Init();
+  MX_USART1_UART_Init();  
   /* USER CODE BEGIN 2 */
 
+ 
+  //__HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
+  
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
   
   uint32_t i = 65536;
@@ -109,6 +118,10 @@ int main(void)
       i--;
   }
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
+  
+  
+  uint8_t txbuf[] = {0x61,0x31};
+  HAL_UART_Transmit( &huart1, txbuf , 2, 20 ); 
   
   /* USER CODE END 2 */
 
@@ -197,7 +210,7 @@ static void MX_USART1_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART1_Init 2 */
-
+  //__HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
   /* USER CODE END USART1_Init 2 */
 
 }
